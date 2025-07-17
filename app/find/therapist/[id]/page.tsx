@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, Calendar, Clock, MapPin, Star } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, MapPin, Star, Monitor, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,13 +10,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookSessionModal } from "@/components/book-session-modal"
 import { mockTherapists } from "@/lib/mock-data"
-import { generateWeeklySlots, formatTime } from "@/lib/utils"
+import { generateWeeklySlotsWithModality, formatTime } from "@/lib/utils"
+import type { SessionModality, AvailabilitySlot } from "@/lib/types"
 
 export default function TherapistDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedModality, setSelectedModality] = useState<SessionModality | undefined>(undefined)
 
   const therapist = mockTherapists.find((t) => t.id === params.id)
 
@@ -31,7 +33,7 @@ export default function TherapistDetailPage() {
     )
   }
 
-  const weeklySlots = generateWeeklySlots(therapist.availableSlots)
+  const weeklySlots = generateWeeklySlotsWithModality(therapist.availableSlots, selectedModality)
   const today = new Date()
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(today)
@@ -39,9 +41,17 @@ export default function TherapistDetailPage() {
     return date
   })
 
-  const handleSlotClick = (slot: string) => {
+  const handleSlotClick = (slot: AvailabilitySlot) => {
     setSelectedSlot(slot)
     setModalOpen(true)
+  }
+
+  const getModalityIcon = (modality: SessionModality) => {
+    return modality === 'online' ? Monitor : Users
+  }
+
+  const getModalityLabel = (modality: SessionModality) => {
+    return modality === 'online' ? 'Online' : 'Presencial'
   }
 
   return (
@@ -79,12 +89,24 @@ export default function TherapistDetailPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-2">
                 {therapist.specialties.map((specialty) => (
                   <Badge key={specialty} variant="secondary" className="text-xs">
                     {specialty}
                   </Badge>
                 ))}
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                {therapist.supportedModalities.map((modality) => {
+                  const Icon = getModalityIcon(modality)
+                  return (
+                    <Badge key={modality} variant="outline" className="text-xs">
+                      <Icon className="h-3 w-3 mr-1" />
+                      {getModalityLabel(modality)}
+                    </Badge>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -110,6 +132,36 @@ export default function TherapistDetailPage() {
               <h2 className="text-lg font-semibold">Horarios disponibles</h2>
             </div>
 
+            {/* Modality Filter */}
+            {therapist.supportedModalities.length > 1 && (
+              <div className="mb-4">
+                <p className="text-sm font-medium mb-2">Filtrar por modalidad:</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={selectedModality === undefined ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedModality(undefined)}
+                  >
+                    Todas
+                  </Button>
+                  {therapist.supportedModalities.map((modality) => {
+                    const Icon = getModalityIcon(modality)
+                    return (
+                      <Button
+                        key={modality}
+                        variant={selectedModality === modality ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedModality(modality)}
+                      >
+                        <Icon className="h-3 w-3 mr-1" />
+                        {getModalityLabel(modality)}
+                      </Button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             <Tabs defaultValue="0" className="w-full">
               <TabsList className="grid w-full grid-cols-7 mb-4">
                 {weekDays.map((date, index) => (
@@ -123,18 +175,27 @@ export default function TherapistDetailPage() {
               {weekDays.map((date, dayIndex) => (
                 <TabsContent key={dayIndex} value={dayIndex.toString()}>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {weeklySlots[dayIndex]?.map((slot) => (
-                      <Button
-                        key={slot}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSlotClick(slot)}
-                        className="justify-center text-sm "
-                      >
-                        <Clock className="h-3 w-3 mr-1" />
-                        {formatTime(slot)}
-                      </Button>
-                    )) || (
+                    {weeklySlots[dayIndex]?.map((slot) => {
+                      const ModalityIcon = getModalityIcon(slot.modality)
+                      return (
+                        <Button
+                          key={`${slot.datetime}-${slot.modality}`}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSlotClick(slot)}
+                          className="justify-center text-sm flex-col h-auto py-2"
+                        >
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {formatTime(slot.datetime)}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <ModalityIcon className="h-3 w-3" />
+                            {getModalityLabel(slot.modality)}
+                          </div>
+                        </Button>
+                      )
+                    }) || (
                       <div className="col-span-full text-center py-8">
                           No hay turnos disponibles para este día
                       </div>

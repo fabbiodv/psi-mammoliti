@@ -1,10 +1,10 @@
 import Link from "next/link"
-import { Clock, AlertTriangle } from "lucide-react"
+import { Clock, AlertTriangle, Monitor, Users } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatTime } from "@/lib/utils"
-import type { Therapist } from "@/lib/types"
+import type { Therapist, SessionModality } from "@/lib/types"
 
 interface TherapistCardProps {
   therapist: Therapist
@@ -13,6 +13,14 @@ interface TherapistCardProps {
 export function TherapistCard({ therapist }: TherapistCardProps) {
   const nextSlots = therapist.availableSlots.slice(0, 3)
   const hasLimitedAvailability = therapist.availableSlots.length <= 3
+  
+  const getModalityIcon = (modality: SessionModality) => {
+    return modality === 'online' ? Monitor : Users
+  }
+  
+  const getModalityLabel = (modality: SessionModality) => {
+    return modality === 'online' ? 'Online' : 'Presencial'
+  }
 
   return (
     <Link href={`/find/therapist/${therapist.id}`}>
@@ -54,6 +62,19 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
             )}
           </div>
 
+          {/* Session Modalities */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {therapist.supportedModalities.map((modality) => {
+              const Icon = getModalityIcon(modality)
+              return (
+                <Badge key={modality} variant="outline" className="text-xs">
+                  <Icon className="h-3 w-3 mr-1" />
+                  {getModalityLabel(modality)}
+                </Badge>
+              )
+            })}
+          </div>
+
           {/* Next Available Slots */}
           <div>
             <p className="text-sm font-medium mb-2 flex items-center">
@@ -61,17 +82,23 @@ export function TherapistCard({ therapist }: TherapistCardProps) {
               Próximos turnos disponibles
             </p>
             <div className="space-y-1">
-              {nextSlots.map((slot) => (
-                <div key={slot} className="text-sm">
-                  {new Date(slot).toLocaleDateString("es-ES", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                  })}{" "}
-                  a las {formatTime(slot)}
-                </div>
-              ))}
+              {nextSlots.map((slot) => {
+                const Icon = getModalityIcon(slot.modality)
+                return (
+                  <div key={`${slot.datetime}-${slot.modality}`} className="text-sm flex items-center gap-2">
+                    <Icon className="h-3 w-3" />
+                    <span>
+                      {new Date(slot.datetime).toLocaleDateString("es-ES", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                      })}{" "}
+                      a las {formatTime(slot.datetime)} ({getModalityLabel(slot.modality)})
+                    </span>
+                  </div>
+                )
+              })}
               {nextSlots.length === 0 && <div className="text-sm">No hay turnos disponibles</div>}
             </div>
           </div>

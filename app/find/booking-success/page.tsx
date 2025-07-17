@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { mockTherapists } from "@/lib/mock-data"
 import { formatTime, formatDate } from "@/lib/utils"
+import type { SessionModality } from "@/lib/types"
 
 export default function BookingSuccessPage() {
   const searchParams = useSearchParams()
@@ -14,10 +15,15 @@ export default function BookingSuccessPage() {
 
   const therapistId = searchParams.get("therapist")
   const slot = searchParams.get("slot")
+  const modality = searchParams.get("modality") as SessionModality
 
   const therapist = therapistId ? mockTherapists.find((t) => t.id === therapistId) : null
 
-  if (!therapist || !slot) {
+  const getModalityLabel = (modality: SessionModality) => {
+    return modality === 'online' ? 'Online' : 'Presencial'
+  }
+
+  if (!therapist || !slot || !modality) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -86,7 +92,7 @@ export default function BookingSuccessPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm">Tipo</span>
-                <span className="text-sm font-medium">Sesión online</span>
+                <span className="text-sm font-medium">Sesión {getModalityLabel(modality).toLowerCase()}</span>
               </div>
             </div>
           </div>

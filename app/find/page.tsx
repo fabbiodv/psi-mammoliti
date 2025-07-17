@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, Filter } from "lucide-react"
+import React, { useState, useMemo } from "react"
+import { Search, Filter, Monitor, Users } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -9,6 +9,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from "@/components/ui/badge"
 import { mockTherapists } from "@/lib/mock-data"
 import { TherapistCard } from "@/components/therapist-card"
+import type { SessionModality } from "@/lib/types"
 
 const specialties = [
   "Ansiedad",
@@ -23,9 +24,15 @@ const specialties = [
   "Trastorno obsesivo-compulsivo",
 ]
 
+const modalities: { value: SessionModality; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'online', label: 'Online', icon: Monitor },
+  { value: 'presencial', label: 'Presencial', icon: Users },
+]
+
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([])
+  const [selectedModalities, setSelectedModalities] = useState<SessionModality[]>([])
   const [filterOpen, setFilterOpen] = useState(false)
 
   const filteredTherapists = useMemo(() => {
@@ -34,10 +41,13 @@ export default function HomePage() {
       const matchesSpecialties =
         selectedSpecialties.length === 0 ||
         selectedSpecialties.some((specialty) => therapist.specialties.includes(specialty))
+      const matchesModalities =
+        selectedModalities.length === 0 ||
+        selectedModalities.some((modality) => therapist.supportedModalities.includes(modality))
 
-      return matchesSearch && matchesSpecialties
+      return matchesSearch && matchesSpecialties && matchesModalities
     })
-  }, [searchQuery, selectedSpecialties])
+  }, [searchQuery, selectedSpecialties, selectedModalities])
 
   const toggleSpecialty = (specialty: string) => {
     setSelectedSpecialties((prev) =>
@@ -45,8 +55,15 @@ export default function HomePage() {
     )
   }
 
+  const toggleModality = (modality: SessionModality) => {
+    setSelectedModalities((prev) =>
+      prev.includes(modality) ? prev.filter((m) => m !== modality) : [...prev, modality],
+    )
+  }
+
   const clearFilters = () => {
     setSelectedSpecialties([])
+    setSelectedModalities([])
     setSearchQuery("")
   }
 
@@ -73,18 +90,47 @@ export default function HomePage() {
                 <Button variant="outline" className="shrink-0 bg-transparent">
                   <Filter className="h-4 w-4 mr-2" />
                   Filtrar
-                  {selectedSpecialties.length > 0 && (
+                  {(selectedSpecialties.length > 0 || selectedModalities.length > 0) && (
                     <Badge variant="secondary" className="ml-2">
-                      {selectedSpecialties.length}
+                      {selectedSpecialties.length + selectedModalities.length}
                     </Badge>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="end">
                 <Command className="rounded-lg border shadow-md md:min-w-[450px]">
-                  <CommandInput placeholder="Buscar especialidades..."/>
+                  <CommandInput placeholder="Buscar filtros..."/>
                   <CommandList >
-                    <CommandEmpty>No se encontraron especialidades.</CommandEmpty>
+                    <CommandEmpty>No se encontraron filtros.</CommandEmpty>
+                    <CommandGroup heading="Modalidad">
+                      {modalities.map((modality) => {
+                        const Icon = modality.icon
+                        return (
+                          <CommandItem
+                            key={modality.value}
+                            onSelect={() => toggleModality(modality.value)}
+                            className="cursor-pointer"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <div
+                                className={`w-4 h-4 border rounded ${selectedModalities.includes(modality.value)
+                                    ? "bg-indigo-600 border-indigo-600"
+                                    : "border-gray-300"
+                                  }`}
+                              >
+                                {selectedModalities.includes(modality.value) && (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <div className="w-2 h-2 bg-white rounded-full" />
+                                  </div>
+                                )}
+                              </div>
+                              <Icon className="h-4 w-4" />
+                              <span>{modality.label}</span>
+                            </div>
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
                     <CommandGroup heading="Especialidades">
                       {specialties.map((specialty) => (
                         <CommandItem
@@ -112,7 +158,7 @@ export default function HomePage() {
                     </CommandGroup>
                   </CommandList>
                 </Command>
-                {selectedSpecialties.length > 0 && (
+                {(selectedSpecialties.length > 0 || selectedModalities.length > 0) && (
                   <div className="p-3 border-t">
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="w-full">
                       Limpiar todos los filtros
@@ -124,8 +170,23 @@ export default function HomePage() {
           </div>
 
           {/* Active Filters */}
-          {selectedSpecialties.length > 0 && (
+          {(selectedSpecialties.length > 0 || selectedModalities.length > 0) && (
             <div className="flex flex-wrap gap-2 mt-3">
+              {selectedModalities.map((modality) => {
+                const modalityConfig = modalities.find(m => m.value === modality)
+                const Icon = modalityConfig?.icon
+                return (
+                  <Badge
+                    key={modality}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-gray-100"
+                    onClick={() => toggleModality(modality)}
+                  >
+                    {Icon && <Icon className="h-3 w-3 mr-1" />}
+                    {modalityConfig?.label} ×
+                  </Badge>
+                )
+              })}
               {selectedSpecialties.map((specialty) => (
                 <Badge
                   key={specialty}

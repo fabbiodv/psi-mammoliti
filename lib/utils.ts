@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { AvailabilitySlot, SessionModality } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -95,6 +96,32 @@ export function generateWeeklySlots(availableSlots: string[]): string[][] {
     if (daysDiff >= 0 && daysDiff < 7) {
       weekSlots[daysDiff].push(slot)
     }
+  })
+
+  return weekSlots
+}
+
+export function generateWeeklySlotsWithModality(availableSlots: AvailabilitySlot[], selectedModality?: SessionModality): AvailabilitySlot[][] {
+  const today = new Date()
+  const weekSlots: AvailabilitySlot[][] = Array.from({ length: 7 }, () => [])
+
+  availableSlots.forEach((slot) => {
+    // Filter by modality if specified
+    if (selectedModality && slot.modality !== selectedModality) {
+      return
+    }
+
+    const slotDate = new Date(slot.datetime)
+    const daysDiff = Math.floor((slotDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+    if (daysDiff >= 0 && daysDiff < 7) {
+      weekSlots[daysDiff].push(slot)
+    }
+  })
+
+  // Sort each day's slots by time
+  weekSlots.forEach(daySlots => {
+    daySlots.sort((a, b) => a.datetime.localeCompare(b.datetime))
   })
 
   return weekSlots

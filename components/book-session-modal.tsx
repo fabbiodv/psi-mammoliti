@@ -1,19 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Calendar, Clock, User, Video } from "lucide-react"
+import { Calendar, Clock, User, Monitor, Users } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatTime } from "@/lib/utils"
-import type { Therapist } from "@/lib/types"
+import type { Therapist, AvailabilitySlot, SessionModality } from "@/lib/types"
 
 interface BookSessionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   therapist: Therapist
-  selectedSlot: string | null
+  selectedSlot: AvailabilitySlot | null
 }
 
 export function BookSessionModal({ open, onOpenChange, therapist, selectedSlot }: BookSessionModalProps) {
@@ -22,7 +22,15 @@ export function BookSessionModal({ open, onOpenChange, therapist, selectedSlot }
 
   if (!selectedSlot) return null
 
-  const slotDate = new Date(selectedSlot)
+  const slotDate = new Date(selectedSlot.datetime)
+  
+  const getModalityIcon = (modality: SessionModality) => {
+    return modality === 'online' ? Monitor : Users
+  }
+  
+  const getModalityLabel = (modality: SessionModality) => {
+    return modality === 'online' ? 'Online' : 'Presencial'
+  }
 
   const handleBookSession = async () => {
     setIsBooking(true)
@@ -34,7 +42,7 @@ export function BookSessionModal({ open, onOpenChange, therapist, selectedSlot }
     onOpenChange(false)
 
     // Navigate to success page
-    router.push(`/find/booking-success?therapist=${therapist.id}&slot=${selectedSlot}`)
+    router.push(`/find/booking-success?therapist=${therapist.id}&slot=${selectedSlot.datetime}&modality=${selectedSlot.modality}`)
   }
 
   return (
@@ -78,12 +86,12 @@ export function BookSessionModal({ open, onOpenChange, therapist, selectedSlot }
 
             <div className="flex items-center gap-3">
               <Clock className="h-4 w-4 text-gray-500" />
-              <span className="text-sm">{formatTime(selectedSlot)} (45 minutos)</span>
+              <span className="text-sm">{formatTime(selectedSlot.datetime)} (45 minutos)</span>
             </div>
 
             <div className="flex items-center gap-3">
-              <Video className="h-4 w-4 text-gray-500" />
-              <span className="text-sm">Sesión online</span>
+              {React.createElement(getModalityIcon(selectedSlot.modality), { className: "h-4 w-4 text-gray-500" })}
+              <span className="text-sm">Sesión {getModalityLabel(selectedSlot.modality).toLowerCase()}</span>
             </div>
 
             <div className="flex items-center gap-3">
