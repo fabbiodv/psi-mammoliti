@@ -47,7 +47,7 @@ export default function TherapistDetailPage() {
   return (
     <div className="min-h-scree">
       {/* Header */}
-      <div className=" border-b sticky top-0 z-10">
+      <div className=" border-b bg-background sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <Button variant="ghost" size="sm" onClick={() => router.push("/find")} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
