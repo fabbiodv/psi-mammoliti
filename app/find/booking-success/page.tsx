@@ -108,7 +108,7 @@ export default function BookingSuccessPage() {
               Agregar al calendario
             </Button>
 
-            <Button variant="outline" onClick={() => router.push("/")} className="w-full">
+            <Button variant="outline" onClick={() => router.push("/find")} className="w-full">
               <Home className="h-4 w-4 mr-2" />
               Volver a la página principal
             </Button>

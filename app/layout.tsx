@@ -47,7 +47,7 @@ export default function RootLayout({
               <div className="block md:hidden">
                 PM
               </div>
-              {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
+              {!hasEnvVars() ? <EnvVarWarning /> : <AuthButton />}
             </div>
           </nav>
           <Toaster />
