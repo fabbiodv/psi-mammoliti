@@ -1,105 +1,333 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# 🧠 Plataforma de Reservas de Sesiones de Psicología
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+Una aplicación web moderna desarrollada con **Next.js 15** que permite a los usuarios encontrar psicólogos, filtrar por especialidades y reservar sesiones online de manera sencilla e intuitiva.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## 📋 Tabla de Contenidos
 
-## Features
+- [🚀 Características Principales](#-características-principales)
+- [🛠️ Stack Tecnológico](#️-stack-tecnológico)
+- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
+- [⚙️ Instalación y Configuración](#️-instalación-y-configuración)
+- [🔄 Flujos Implementados](#-flujos-implementados)
+- [🎯 Decisiones Técnicas y Funcionales](#-decisiones-técnicas-y-funcionales)
+- [📖 Guía de Uso](#-guía-de-uso)
+- [🔐 Autenticación](#-autenticación)
+- [📱 Características de UX/UI](#-características-de-uxui)
+- [🚧 Estado Actual y Limitaciones](#-estado-actual-y-limitaciones)
+- [🔮 Próximas Funcionalidades](#-próximas-funcionalidades)
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+## 🚀 Características Principales
 
-## Demo
+### ✅ Funcionalidades Implementadas
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+- **Sistema de autenticación completo** con Supabase Auth
+- **Búsqueda y filtrado de psicólogos** por nombre y especialidades
+- **Visualización detallada** de perfiles de terapeutas
+- **Sistema de reservas** con calendario interactivo
+- **Gestión de disponibilidad** de horarios
+- **Página de confirmación** de reservas
+- **Integración con Google Calendar**
+- **Diseño responsive** y modo oscuro
+- **Interface moderna** con animaciones suaves
 
-## Deploy to Vercel
+### 🎯 Especialidades Disponibles
 
-Vercel deployment will guide you through creating a Supabase account and project.
+- Ansiedad
+- Depresión
+- Terapia de parejas
+- Trastorno de estrés postraumático
+- Adicción
+- Trastornos de alimentación
+- Luto
+- Gestión del estrés
+- Fobias
+- Trastorno obsesivo-compulsivo
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+## 🛠️ Stack Tecnológico
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### Frontend
+- **Next.js 15** - Framework React con App Router
+- **React 19** - Biblioteca de UI
+- **TypeScript** - Tipado estático
+- **Tailwind CSS** - Framework de estilos
+- **Radix UI** - Componentes primitivos accesibles
+- **Lucide React** - Iconos
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### Backend y Base de Datos
+- **Supabase** - Backend como servicio (BaaS)
+- **Supabase Auth** - Sistema de autenticación
+- **Supabase Database** - Base de datos PostgreSQL
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### Herramientas de Desarrollo
+- **ESLint** - Linting de código
+- **PostCSS** - Procesamiento de CSS
+- **Turbopack** - Bundler para desarrollo rápido
 
-## Clone and run locally
+## 📁 Estructura del Proyecto
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+```
+├── app/                      # App Router de Next.js
+│   ├── auth/                 # Páginas de autenticación
+│   │   ├── login/            # Inicio de sesión
+│   │   ├── sign-up/          # Registro
+│   │   ├── forgot-password/  # Recuperación de contraseña
+│   │   ├── update-password/  # Actualización de contraseña
+│   │   ├── confirm/          # Confirmación de email
+│   │   └── error/            # Página de errores
+│   ├── find/                 # Sistema de búsqueda y reservas
+│   │   ├── page.tsx          # Lista de psicólogos con filtros
+│   │   ├── therapist/[id]/   # Detalle de terapeuta
+│   │   └── booking-success/  # Confirmación de reserva
+│   ├── layout.tsx            # Layout principal
+│   ├── page.tsx              # Página de inicio
+│   └── globals.css           # Estilos globales
+├── components/               # Componentes React
+│   ├── ui/                   # Componentes base de UI
+│   ├── auth-button.tsx       # Botón de autenticación
+│   ├── login-form.tsx        # Formulario de login
+│   ├── sign-up-form.tsx      # Formulario de registro
+│   ├── therapist-card.tsx    # Tarjeta de terapeuta
+│   ├── book-session-modal.tsx # Modal de reserva
+│   └── theme-switcher.tsx    # Selector de tema
+├── lib/                      # Utilidades y configuración
+│   ├── supabase/             # Configuración de Supabase
+│   ├── mock-data.ts          # Datos de prueba
+│   ├── types.ts              # Tipos TypeScript
+│   └── utils.ts              # Funciones utilitarias
+└── middleware.ts             # Middleware de autenticación
+```
 
-2. Create a Next.js app using the Supabase Starter template npx command
+## ⚙️ Instalación y Configuración
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+### 1. Clonar el Repositorio
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+```bash
+git clone <url-del-repositorio>
+cd psi-mammoliti
+```
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+### 2. Instalar Dependencias
 
-3. Use `cd` to change into the app's directory
+```bash
+npm install
+```
 
-   ```bash
-   cd with-supabase-app
-   ```
+### 3. Configurar Variables de Entorno
 
-4. Rename `.env.example` to `.env.local` and update the following:
+Crea un archivo `.env.local` basado en `.env.example`:
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+```bash
+cp .env.example .env.local
+```
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+Completa las variables de Supabase:
 
-5. You can now run the Next.js local development server:
+```env
+NEXT_PUBLIC_SUPABASE_URL=tu-url-de-supabase
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=tu-clave-publica-de-supabase
+VERCEL_PROJECT_PRODUCTION_URL=tu-url-de-produccion
+```
 
-   ```bash
-   npm run dev
-   ```
+### 4. Configurar Supabase
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+1. Crea un proyecto en [Supabase](https://supabase.com)
+2. Obtén las credenciales del proyecto
+3. Configura las políticas de autenticación según tus necesidades
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+### 5. Ejecutar en Desarrollo
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+```bash
+npm run dev
+```
 
-## Feedback and issues
+La aplicación estará disponible en `http://localhost:3000`
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+### 6. Comandos Disponibles
 
-## More Supabase examples
+```bash
+npm run dev      # Ejecutar en modo desarrollo con Turbopack
+npm run build    # Compilar para producción
+npm run start    # Ejecutar versión de producción
+npm run lint     # Ejecutar linting
+```
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## 🔄 Flujos Implementados
+
+### 1. Flujo de Autenticación
+
+**Registro de Usuario:**
+```
+Inicio → Registro → Confirmación por Email → Login → Dashboard
+```
+
+**Funcionalidades incluidas:**
+- ✅ Registro con email y contraseña
+- ✅ Confirmación por email
+- ✅ Inicio de sesión
+- ✅ Recuperación de contraseña
+- ✅ Actualización de contraseña
+- ✅ Cierre de sesión
+- ✅ Protección de rutas con middleware
+
+### 2. Flujo de Búsqueda de Psicólogos
+
+**Búsqueda y Filtrado:**
+```
+Lista de Psicólogos → Filtros por Especialidad → Búsqueda por Nombre → Resultados
+```
+
+**Funcionalidades incluidas:**
+- ✅ Visualización de todos los psicólogos disponibles
+- ✅ Filtro múltiple por especialidades
+- ✅ Búsqueda por nombre
+- ✅ Indicadores de disponibilidad
+- ✅ Contador de resultados
+- ✅ Limpieza de filtros
+
+### 3. Flujo de Reserva de Sesiones
+
+**Proceso de Reserva:**
+```
+Lista → Selección de Psicólogo → Ver Perfil → Elegir Horario → Confirmar Reserva → Confirmación
+```
+
+**Funcionalidades incluidas:**
+- ✅ Perfil detallado del terapeuta
+- ✅ Calendario semanal interactivo
+- ✅ Selección de horarios disponibles
+- ✅ Modal de confirmación de reserva
+- ✅ Página de éxito con detalles
+- ✅ Integración con Google Calendar
+- ✅ Instrucciones post-reserva
+
+### 4. Flujo de Experiencia de Usuario
+
+**Navegación:**
+```
+Landing Page → Búsqueda → Selección → Reserva → Confirmación
+```
+
+**Características de UX:**
+- ✅ Diseño responsivo para móviles y desktop
+- ✅ Modo oscuro/claro automático
+- ✅ Animaciones y transiciones suaves
+- ✅ Estados de carga
+- ✅ Manejo de errores
+- ✅ Navegación intuitiva
+
+### Arquitectura
+
+**Next.js 15 con App Router:**
+- **Decisión:** Utilizar el nuevo App Router para aprovechar las mejores prácticas
+- **Beneficio:** Mejor performance, SEO optimizado, y routing más intuitivo
+
+**Supabase como Backend:**
+- **Decisión:** BaaS para acelerar el desarrollo
+- **Beneficio:** Autenticación robusta, base de datos PostgreSQL, APIs automáticas
+
+### Gestión de Estados
+
+**Server Components por Defecto:**
+- **Decisión:** Maximizar el uso de Server Components
+- **Beneficio:** Mejor performance inicial y menor bundle JavaScript
+
+**Client Components Solo Cuando Necesario:**
+- **Decisión:** Usar 'use client' solo para interactividad
+- **Ejemplos:** Formularios, modales, filtros dinámicos
+
+### Diseño y UX
+
+**Sistema de Diseño Consistente:**
+- **Componentes:** Radix UI como base para accesibilidad
+- **Estilos:** Tailwind CSS para rapidez de desarrollo
+- **Iconos:** Lucide React para consistencia visual
+
+**Datos de Prueba Realistas:**
+- **Decisión:** Crear datos mock detallados y variados
+- **Beneficio:** Experiencia de usuario realista durante desarrollo
+
+### Funcionalidades de Negocio
+
+**Gestión de Disponibilidad:**
+- **Lógica:** Algoritmo para generar horarios realistas
+- **Variación:** Algunos terapeutas con "poca disponibilidad"
+- **Formato:** Slots de 45 minutos en horarios laborales
+
+**Sistema de Especialidades:**
+- **Categorización:** 10 especialidades principales
+- **Filtrado:** Múltiple selección para mayor flexibilidad
+
+## 📖 Guía de Uso
+
+### Para Usuarios Finales
+
+#### 1. Crear Cuenta
+1. Hacer clic en "Comenzar ahora" desde la página principal
+2. Completar el formulario de registro
+3. Confirmar email recibido
+4. Iniciar sesión
+
+#### 2. Buscar Psicólogo
+1. Navegar a la sección "Encontrá tu psicólogo"
+2. Usar filtros por especialidad si es necesario
+3. Buscar por nombre específico (opcional)
+4. Revisar perfiles disponibles
+
+#### 3. Reservar Sesión
+1. Hacer clic en el psicólogo deseado
+2. Revisar su perfil y especialidades
+3. Seleccionar día en el calendario
+4. Elegir horario disponible
+5. Confirmar la reserva
+6. Agregar al calendario personal
+
+
+## 🔐 Autenticación
+
+### Sistema Implementado
+
+**Proveedor:** Supabase Auth
+**Métodos soportados:**
+- ✅ Email/Contraseña
+- ✅ Confirmación por email
+- ✅ Recuperación de contraseña
+- ✅ Actualización de contraseña
+
+### Protección de Rutas
+
+**Middleware:** Protege automáticamente rutas sensibles
+**Rutas Públicas:** Landing page, login, registro
+**Rutas Protegidas:** Dashboard de búsqueda y reservas
+
+### Gestión de Sesiones
+
+**SSR:** Manejo de sesiones server-side
+**Persistencia:** Sesiones persisten entre recargas
+**Expiración:** Manejo automático de tokens expirados
+
+## 📱 Características de UX/UI
+
+### Diseño Responsivo
+
+**Mobile First:** Optimizado para dispositivos móviles
+**Breakpoints:** Responsive en tablet y desktop
+**Componentes:** Adaptables a diferentes tamaños de pantalla
+
+### Modo Oscuro
+
+**Implementación:** next-themes para persistencia
+**Toggle:** Selector en la navegación principal
+**Consistencia:** Todos los componentes soportan ambos modos
+
+
+## 🚧 Estado Actual y Limitaciones
+
+### ✅ Funcionalidades Completadas
+
+- Sistema de autenticación completo
+- Búsqueda y filtrado de terapeutas
+- Sistema de reservas end-to-end
+- UI/UX moderna y responsiva
+- Integración con calendario
+- Manejo de errores básico
+
