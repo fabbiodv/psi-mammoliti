@@ -7,7 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatTime } from "@/lib/utils"
+import { bookSlot } from "@/lib/database"
 import type { Therapist, AvailabilitySlot, SessionModality } from "@/lib/types"
+import { toast } from "sonner"
 
 interface BookSessionModalProps {
   open: boolean
@@ -35,14 +37,29 @@ export function BookSessionModal({ open, onOpenChange, therapist, selectedSlot }
   const handleBookSession = async () => {
     setIsBooking(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    console.log('Booking request data:', {
+      therapistId: therapist.id,
+      datetime: selectedSlot.datetime,
+      modality: selectedSlot.modality
+    })
 
-    setIsBooking(false)
-    onOpenChange(false)
-
-    // Navigate to success page
-    router.push(`/find/booking-success?therapist=${therapist.id}&slot=${selectedSlot.datetime}&modality=${selectedSlot.modality}`)
+    try {
+      const success = await bookSlot(therapist.id, selectedSlot.datetime, selectedSlot.modality)
+      
+      if (success) {
+        onOpenChange(false)
+        // Navigate to success page
+        router.push(`/find/booking-success?therapist=${therapist.id}&slot=${encodeURIComponent(selectedSlot.datetime)}&modality=${selectedSlot.modality}`)
+      } else {
+        // Handle booking failure
+        toast.error('Error al agendar la sesión. Por favor, inténtelo de nuevo.')
+      }
+    } catch (error) {
+      console.error('Booking error:', error)
+      toast.error('Error al agendar la sesión. Por favor, inténtelo de nuevo.')
+    } finally {
+      setIsBooking(false)
+    }
   }
 
   return (

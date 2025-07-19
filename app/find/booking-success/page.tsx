@@ -1,33 +1,76 @@
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { CheckCircle, Home, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { mockTherapists } from "@/lib/mock-data"
+import { getTherapistById } from "@/lib/database"
 import { formatTime, formatDate } from "@/lib/utils"
-import type { SessionModality } from "@/lib/types"
+import type { SessionModality, Therapist } from "@/lib/types"
 
 export default function BookingSuccessPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [therapist, setTherapist] = useState<Therapist | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const therapistId = searchParams.get("therapist")
   const slot = searchParams.get("slot")
   const modality = searchParams.get("modality") as SessionModality
 
-  const therapist = therapistId ? mockTherapists.find((t) => t.id === therapistId) : null
+  // Ensure slot is properly decoded from URL
+  const decodedSlot = slot ? decodeURIComponent(slot) : null
+
+  useEffect(() => {
+    async function fetchTherapist() {
+      if (!therapistId) {
+        setLoading(false)
+        return
+      }
+      
+      try {
+        const therapistData = await getTherapistById(therapistId)
+        setTherapist(therapistData)
+      } catch (error) {
+        console.error('Error fetching therapist:', error)
+        setTherapist(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTherapist()
+  }, [therapistId])
 
   const getModalityLabel = (modality: SessionModality) => {
     return modality === 'online' ? 'Online' : 'Presencial'
   }
 
-  if (!therapist || !slot || !modality) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="mb-4">Información de la sesión no encontrada</p>
+          <p className="mb-4">Cargando información de la sesión...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Validate that we have all required data and that the date is valid
+  const isValidDate = decodedSlot ? !isNaN(new Date(decodedSlot).getTime()) : false
+  
+  if (!therapist || !decodedSlot || !modality || !isValidDate) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4">
+            {!therapist && "Terapeuta no encontrado"}
+            {!decodedSlot && "Información de horario no encontrada"}
+            {!modality && "Modalidad de sesión no especificada"}
+            {decodedSlot && !isValidDate && "Formato de fecha inválido"}
+          </p>
           <Button onClick={() => router.push("/")}>Volver a la página principal</Button>
         </div>
       </div>
@@ -35,7 +78,17 @@ export default function BookingSuccessPage() {
   }
 
   const handleAddToCalendar = () => {
-    const startDate = new Date(slot)
+    if (!decodedSlot) return
+    
+    const startDate = new Date(decodedSlot)
+    
+    // Check if date is valid
+    if (isNaN(startDate.getTime())) {
+      console.error('Invalid date for calendar:', decodedSlot)
+      alert('Error al agregar al calendario: fecha inválida')
+      return
+    }
+    
     const endDate = new Date(startDate.getTime() + 45 * 60 * 1000) // 45 minutes later
 
     const title = `Sesión con ${therapist.name}`
@@ -80,11 +133,11 @@ export default function BookingSuccessPage() {
             <div className="p-4 rounded-lg text-left space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm">Fecha</span>
-                <span className="text-sm font-medium">{formatDate(slot)}</span>
+                <span className="text-sm font-medium">{formatDate(decodedSlot!)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm">Hora</span>
-                <span className="text-sm font-medium">{formatTime(slot)}</span>
+                <span className="text-sm font-medium">{formatTime(decodedSlot!)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm">Duración</span>

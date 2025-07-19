@@ -55,7 +55,11 @@ export function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      {user.email}
+      {/* Email completo en desktop, solo inicial en mobile */}
+      <span className="hidden sm:inline">{user.email}</span>
+      <span className="sm:hidden w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+        {user.email?.[0]?.toUpperCase()}
+      </span>
       <LogoutButton />
     </div>
   ) : (

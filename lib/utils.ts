@@ -66,6 +66,13 @@ export function redirectAfterAuth(path: string) {
 
 export function formatTime(isoString: string): string {
   const date = new Date(isoString)
+  
+  // Check if date is invalid
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date string provided to formatTime:', isoString)
+    return 'Hora inválida'
+  }
+  
   return date.toLocaleTimeString("es-ES", {
     hour: "numeric",
     minute: "2-digit",
@@ -76,6 +83,13 @@ export function formatTime(isoString: string): string {
 
 export function formatDate(isoString: string): string {
   const date = new Date(isoString)
+  
+  // Check if date is invalid
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date string provided to formatDate:', isoString)
+    return 'Fecha inválida'
+  }
+  
   return date.toLocaleDateString("es-ES", {
     weekday: "long",
     year: "numeric",
@@ -102,7 +116,8 @@ export function generateWeeklySlots(availableSlots: string[]): string[][] {
 }
 
 export function generateWeeklySlotsWithModality(availableSlots: AvailabilitySlot[], selectedModality?: SessionModality): AvailabilitySlot[][] {
-  const today = new Date()
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const weekSlots: AvailabilitySlot[][] = Array.from({ length: 7 }, () => [])
 
   availableSlots.forEach((slot) => {
@@ -112,10 +127,22 @@ export function generateWeeklySlotsWithModality(availableSlots: AvailabilitySlot
     }
 
     const slotDate = new Date(slot.datetime)
-    const daysDiff = Math.floor((slotDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    const slotDay = new Date(slotDate.getFullYear(), slotDate.getMonth(), slotDate.getDate())
+    const daysDiff = Math.floor((slotDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
+    // Only include slots that are:
+    // 1. Within the next 7 days
+    // 2. If it's today (daysDiff === 0), only future slots
     if (daysDiff >= 0 && daysDiff < 7) {
-      weekSlots[daysDiff].push(slot)
+      if (daysDiff === 0) {
+        // For today, only show slots that are in the future
+        if (slotDate.getTime() > now.getTime()) {
+          weekSlots[daysDiff].push(slot)
+        }
+      } else {
+        // For future days, show all slots
+        weekSlots[daysDiff].push(slot)
+      }
     }
   })
 
