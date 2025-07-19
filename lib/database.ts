@@ -347,11 +347,8 @@ export async function bookSlot(
   modality: SessionModality
 ): Promise<boolean> {
   try {
-    console.log('Attempting to book slot with:', { therapistId, datetime, modality })
-    
     // Normalize the datetime to ensure consistent formatting
     const normalizedDatetime = new Date(datetime).toISOString()
-    console.log('Normalized datetime:', normalizedDatetime)
     
     // Find all available slots for this therapist and modality
     const { data: availableSlots, error: selectError } = await supabase
@@ -384,8 +381,6 @@ export async function bookSlot(
       return false
     }
 
-    console.log('Found matching slot:', matchingSlot)
-
     // Double-check the slot is still available before updating
     const { data: recheckSlot, error: recheckError } = await supabase
       .from('availability_slots')
@@ -397,8 +392,6 @@ export async function bookSlot(
       console.error('Error rechecking slot:', recheckError)
       return false
     }
-
-    console.log('Slot recheck result:', recheckSlot)
 
     if (recheckSlot.is_booked) {
       console.error('Slot was already booked by another user')
@@ -412,8 +405,6 @@ export async function bookSlot(
       .eq('id', matchingSlot.id)
       .select()
 
-    console.log('Update result:', { data, error })
-
     if (error) {
       console.error('Error booking slot:', error)
       return false
@@ -423,13 +414,12 @@ export async function bookSlot(
       console.error('No slots were updated. The slot might have been booked by another user.')
       
       // Let's check the current state of the slot after failed update
-      const { data: postUpdateSlot } = await supabase
+      await supabase
         .from('availability_slots')
         .select('*')
         .eq('id', matchingSlot.id)
         .single()
       
-      console.log('Slot state after failed update:', postUpdateSlot)
       return false
     }
 

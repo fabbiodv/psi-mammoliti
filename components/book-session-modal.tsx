@@ -36,13 +36,6 @@ export function BookSessionModal({ open, onOpenChange, therapist, selectedSlot }
 
   const handleBookSession = async () => {
     setIsBooking(true)
-
-    console.log('Booking request data:', {
-      therapistId: therapist.id,
-      datetime: selectedSlot.datetime,
-      modality: selectedSlot.modality
-    })
-
     try {
       const success = await bookSlot(therapist.id, selectedSlot.datetime, selectedSlot.modality)
       
